@@ -21,13 +21,48 @@ extern int test_scatterND3x4x3channellast(vector<int> shape1, vector<int> shape2
                                           const char *output_path, int op, int align_to);
 extern int test_scatterND4x5x4channellast(vector<int> shape1, vector<int> shape2, vector<int> shape3,
                                           const char *file_path, const char *indices_path, const char *updates_path,
-                                          const char *output_path, int op);
+                                          const char *output_path, int op, int align_to);
 extern int test_scatterND3x3x3(vector<int> shape1, vector<int> shape2, vector<int> shape3, const char *file_path,
                                const char *indices_path, const char *updates_path, const char *output_path, int op);
 extern int test_scatterND3x3x3channellast(vector<int> shape1, vector<int> shape2, vector<int> shape3,
                                           const char *file_path, const char *indices_path, const char *updates_path,
-                                          const char *output_path, int op);
-// 带索引的矩阵打印函数
+                                          const char *output_path, int op, int align_to);
+/**
+ * @description: 给scatternd三维索引用的，将第一列的数据转移到最后一列去，和input匹配
+ * @param {int} *indices
+ * @param {int} rows
+ * @param {int} cols
+ * @return {*}
+ */
+static void rotateColumns(int *indices, int rows, int cols)
+{
+    for (int i = 0; i < rows; ++i)
+    {
+        std::rotate(indices + i * cols, indices + i * cols + 1, indices + (i + 1) * cols);
+    }
+}
+/**
+ * @description: 给scatternd四维索引用的，将第二列的数据转移到最后一列去，和input匹配
+ * @param {int} *array
+ * @param {int} rows
+ * @param {int} cols
+ * @return {*}
+ */
+static void moveSecondColumnToLast(int *array, int rows, int cols)
+{
+    for (int i = 0; i < rows; ++i)
+    {
+        std::rotate(array + i * cols + 1, array + i * cols + 2, array + (i + 1) * cols);
+    }
+}
+
+/**
+ * @description: 带索引的mat打印函数,scatternd调试用的
+ * @param {char} *prefix
+ * @param {int} index
+ * @param {Mat} &m
+ * @return {*}
+ */
 static void printMatWithIndex(const char *prefix, int index, const ncnn::Mat &m)
 {
     char filename[256];
@@ -41,13 +76,9 @@ static void printMatWithIndex(const char *prefix, int index, const ncnn::Mat &m)
         return;
     }
 
-    // 写入维度信息
-    // fprintf(fp, "Dimensions: C=%d H=%d W=%d\n", m.c, m.h, m.w);
-
     // 写入数据
     for (int q = 0; q < m.c; ++q)
     {
-        // fprintf(fp, "Channel %d:\n", q);
         const float *ptr = m.channel(q);
         for (int y = 0; y < m.h; ++y)
         {
@@ -55,14 +86,44 @@ static void printMatWithIndex(const char *prefix, int index, const ncnn::Mat &m)
             {
                 fprintf(fp, "%.6f\n", ptr[x]);
             }
-            // fprintf(fp, "\n");
             ptr += m.w;
         }
-        // fprintf(fp, "\n");
     }
 
     fclose(fp);
     printf("数据已写入 %s\n", filename);
+}
+static void writeAllMats4dToFile(const char *path, const std::vector<ncnn::Mat> &result)
+{
+    FILE *fp = fopen(path, "w");
+    if (fp == nullptr)
+    {
+        printf("无法打开文件 %s\n", path);
+        return;
+    }
+
+    for (size_t i = 0; i < result.size(); i++)
+    {
+        const ncnn::Mat &m = result[i];
+        for (int q = 0; q < m.c; q++)
+        {
+            const float *ptr = m.channel(q);
+            for (int z = 0; z < m.d; z++) // 新增d维度循环
+            {
+                for (int y = 0; y < m.h; y++)
+                {
+                    for (int x = 0; x < m.w; x++)
+                    {
+                        fprintf(fp, "%.6f\n", ptr[x]);
+                    }
+                    ptr += m.w; // 按行步进指针
+                }
+            }
+        }
+    }
+
+    fclose(fp);
+    printf("所有数据已写入 %s\n", path);
 }
 static void writeAllMatsToFile(const char *path, const std::vector<ncnn::Mat> &result)
 {                                // smh
