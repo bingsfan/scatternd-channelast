@@ -31,16 +31,6 @@
 #define EPSILON 1e-8 // 设定精度误差范围
 using namespace std;
 
-extern int test_einsum4x3(vector<int> shape1, vector<int> shape2, const char *file_path1,
-                   const char *file_path2, string equation, const char *output_path) ;
-extern int test_einsum4x3channellast(vector<int> shape1, vector<int> shape2, const char *file_path1,
-				   const char *file_path2, string equation, const char *output_path,int align_to);
-extern int test_einsum3x4channnellast(vector<int> shape1, vector<int> shape2, const char *file_path1,
-                                      const char *file_path2, string equation, const char *output_path, int align_to);
-extern int test_einsum4x4(vector<int> shape1, vector<int> shape2, const char *file_path1,
-                          const char *file_path2, string equation, const char *output_path);
-extern int test_einsum3x4(vector<int> shape1, vector<int> shape2, const char *file_path1,
-                          const char *file_path2, string equation, const char *output_path);
 static struct prng_rand_t g_prng_rand_state;
 
 #define SRAND(seed) prng_srand(seed, &g_prng_rand_state)
@@ -149,7 +139,9 @@ static float *readFile(const char *path, int len)
         return dataBuf;
     }
 }
-
+/**
+ * @brief:给einsum用的，不确定之后还能不能用上
+ */
 static float *readFileChannellast(const char *path, int H, int W, int C, int C_aligned, int C_actual, int &out_len)
 {//einsum用的
     FILE *fp = fopen(path, "r");
