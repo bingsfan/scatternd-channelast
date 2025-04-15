@@ -123,7 +123,7 @@ static void writeAllMats4dToFile(const char *path, const std::vector<ncnn::Mat> 
     }
 
     fclose(fp);
-    printf("所有数据已写入 %s\n", path);
+    // printf("所有数据已写入 %s\n", path);
 }
 static void writeAllMatsToFile(const char *path, const std::vector<ncnn::Mat> &result)
 {                                // smh
@@ -159,7 +159,7 @@ static void writeAllMatsToFile(const char *path, const std::vector<ncnn::Mat> &r
     }
 
     fclose(fp);
-    printf("所有数据已写入 %s\n", path);
+    // printf("所有数据已写入 %s\n", path);
 }
 // 修改后的文件写入函数（添加索引后缀）
 static void matToFileWithIndex(const char *base_path, int index, const ncnn::Mat &m)

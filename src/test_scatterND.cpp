@@ -61,7 +61,7 @@ int test_scatterND3x2x1channellast(vector<int> shape1, vector<int> shape2, vecto
 								   const char *file_path, const char *indices_path,
 								   const char *updates_path, const char *output_path, int op,
 								   int align_to) {
-	printf("=====   test_scatterND3x2x1 start   ======\n");
+	// printf("=====   test_scatterND3x2x1 start   ======\n");
 	int ret;
 	int w1 = shape1[2], h1 = shape1[1], c1 = shape1[0];
 	int w2 = shape2[1], h2 = shape2[0];
@@ -92,7 +92,7 @@ int test_scatterND3x2x1channellast(vector<int> shape1, vector<int> shape2, vecto
 		newinput[i] = vector<float>(data + i * block_size, data + (i + 1) * block_size);
 	}
 	vector<int> vec_index(indices, indices + indices_size);
-	int k		= 0;
+	int k = 0;
 	// 写一个方法将blocknums块的索引分开,input,index，updates都得分开
 	// input在读取的时候按块分开了，index和updates需要手动计算出来
 	// 将每一块的c和updates放到不同的数组中去
@@ -118,7 +118,7 @@ int test_scatterND3x2x1channellast(vector<int> shape1, vector<int> shape2, vecto
 		// matToFileWithIndex(output_path, j, result[j]);
 	}
 	writeAllMatsToFile(output_path, result);
-	printf("====    test_scatterND3x2x1 end    =======\n\n");
+	// printf("====    test_scatterND3x2x1 end    =======\n\n");
 	return 0;
 }
 int test_scatterND3x3x3(vector<int> shape1, vector<int> shape2, vector<int> shape3,
@@ -150,7 +150,7 @@ int test_scatterND3x3x3channellast(vector<int> shape1, vector<int> shape2, vecto
 								   const char *file_path, const char *indices_path,
 								   const char *updates_path, const char *output_path, int op,
 								   int align_to) {
-	printf("=====   test_scatterND3x3x3 start   ======\n");
+	// printf("=====   test_scatterND3x3x3 start   ======\n");
 	int ret;
 	int w1 = shape1[2], h1 = shape1[1], c1 = shape1[0];
 	int w2 = shape2[2], h2 = shape2[1], c2 = shape2[0];
@@ -161,8 +161,6 @@ int test_scatterND3x3x3channellast(vector<int> shape1, vector<int> shape2, vecto
 	float *data		 = readFile(file_path, input_size);
 	int *indices	 = readFileINT(indices_path, indices_size);
 	float *updates	 = readFile(updates_path, update_size);
-
-
 	// 转变索引，将索引变成四维的，调用3x4x3
 	vector<int> new_indices(c2 * h2 * w3 * (w2 + 1));
 	for(int i = 0; i < c2; ++i) {
@@ -227,7 +225,7 @@ int test_scatterND3x3x3channellast(vector<int> shape1, vector<int> shape2, vecto
 	}
 	writeAllMatsToFile(output_path, result);
 
-	printf("====    test_scatterND3x3x3 end    =======\n\n");
+	// printf("====    test_scatterND3x3x3 end    =======\n\n");
 	return 0;
 }
 int test_scatterND3x4x3(vector<int> shape1, vector<int> shape2, vector<int> shape3,
@@ -259,7 +257,7 @@ int test_scatterND3x4x3channellast(vector<int> shape1, vector<int> shape2, vecto
 								   const char *file_path, const char *indices_path,
 								   const char *updates_path, const char *output_path, int op,
 								   int align_to) {
-	printf("=====   test_scatterND3x4x3 start   ======\n");
+	// printf("=====   test_scatterND3x4x3 start   ======\n");
 	int ret;
 	int w1 = shape1[2], h1 = shape1[1], c1 = shape1[0];
 	int w2 = shape2[3], h2 = shape2[2], c2 = shape2[1], b2 = shape2[0];
@@ -272,11 +270,8 @@ int test_scatterND3x4x3channellast(vector<int> shape1, vector<int> shape2, vecto
 	int *indices   = readFileINT(indices_path, indices_size);
 	float *updates = readFile(updates_path, update_size);
 	rotateColumns(indices, h2 * c2 * b2, w2);
-
-
 	int block_size = input_size / shape1[shape1.size() - 1] * align_to;
 	int blockNums  = input_size / block_size;
-
 	vector<vector<float>> newinput(blockNums);
 	vector<vector<int>> newIndices(blockNums);
 	vector<vector<float>> newUpdates(blockNums);
@@ -305,21 +300,14 @@ int test_scatterND3x4x3channellast(vector<int> shape1, vector<int> shape2, vecto
 	ncnn::Mat index;
 	ncnn::Mat update;
 	vector<ncnn::Mat> result(blockNums);
-	// 得写一个方法将blocknums块的索引分开,input,index，updates都得分开
-	// input在读取的时候按块分开了，index和updates需要手动计算出来
-
 	for(int j = 0; j < blockNums; j++) {
 		input  = InitMat3D_float(align_to, h1, c1, newinput[j].data());
 		index  = InitMat2D_int(3, newUpdates[j].size(), newIndices[j].data());
 		update = InitMat1D_float(newUpdates[j].size(), newUpdates[j].data());
-		// printMatWithIndex("input", j, input);   // 生成 input_0.txt, input_1.txt...
-		// printMatWithIndex("index", j, index);   // 生成 index_0.txt, index_1.txt...
-		// printMatWithIndex("update", j, update); // 生成 update_0.txt, update_1.txt...
 		scatterND(result[j], input, index, update, op);
-		// matToFileWithIndex(output_path, j, result[j]);
 	}
 	writeAllMatsToFile(output_path, result);
-	printf("====    test_scatterND3x4x3 end    =======\n\n");
+	// printf("====    test_scatterND3x4x3 end    =======\n\n");
 	return 0;
 }
 int test_scatterND4x5x4(vector<int> shape1, vector<int> shape2, vector<int> shape3,
@@ -348,11 +336,11 @@ int test_scatterND4x5x4(vector<int> shape1, vector<int> shape2, vector<int> shap
 	printf("====    test_scatterND4x5x4 end    =======\n\n");
 	return 0;
 }
-int test_scatterND4x5x4channellast(
- vector<int> shape1, vector<int> shape2, vector<int> shape3, const char *file_path,
- const char *indices_path, const char *updates_path, const char *output_path, int op,
- int align_to) {	// 目前只能处理indices是五维，但是第一维是1的情况
-	printf("=====   test_scatterND4x5x4 start   ======\n");
+int test_scatterND4x5x4channellast(vector<int> shape1, vector<int> shape2, vector<int> shape3,
+								   const char *file_path, const char *indices_path,
+								   const char *updates_path, const char *output_path, int op,
+								   int align_to) {
+	// printf("=====   test_scatterND4x5x4 start   ======\n");
 	int ret;
 	int w1 = shape1[3], h1 = shape1[2], c1 = shape1[1], b1 = shape1[0];
 	int w2 = shape2[4], h2 = shape2[3], c2 = shape2[2], b2 = shape2[1], d2 = shape2[0];
@@ -379,10 +367,7 @@ int test_scatterND4x5x4channellast(
 	for(int i = 0; i < blockNums; i++) {
 		newinput[i] = vector<float>(data + i * block_size, data + (i + 1) * block_size);
 	}
-	// 处理indices和updates
-	vector<int> vec_index(indices, indices + indices_size);
-	int c_index = 0;
-	int k		= 0;
+	int k = 0;
 	// 将每一块的c和updates放到不同的数组中去
 	for(int i = 3; i < indices_size; i += 4) {
 		int j = indices[i] / align_to;
@@ -397,20 +382,13 @@ int test_scatterND4x5x4channellast(
 	ncnn::Mat index;
 	ncnn::Mat update;
 	vector<ncnn::Mat> result(blockNums);
-	// 得写一个方法将blocknums块的索引分开,input,index，updates都得分开
-	// input在读取的时候按块分开了，index和updates需要手动计算出来
-
 	for(int j = 0; j < blockNums; j++) {
 		input  = InitMat4D_float(align_to, h1, c1, b1, newinput[j].data());
 		index  = InitMat2D_int(4, newUpdates[j].size(), newIndices[j].data());
 		update = InitMat1D_float(newUpdates[j].size(), newUpdates[j].data());
-		// printMatWithIndex("input", j, input);   // 生成 input_0.txt, input_1.txt...
-		// printMatWithIndex("index", j, index);   // 生成 index_0.txt, index_1.txt...
-		// printMatWithIndex("update", j, update); // 生成 update_0.txt, update_1.txt...
 		scatterND(result[j], input, index, update, op);
 	}
 	writeAllMats4dToFile(output_path, result);
-
-	printf("====    test_scatterND4x5x4 end    =======\n\n");
+	// printf("====    test_scatterND4x5x4 end    =======\n\n");
 	return 0;
 }
