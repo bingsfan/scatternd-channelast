@@ -46,7 +46,8 @@
         "queue": "cpp",
         "unordered_set": "cpp",
         "map": "cpp",
-        "functional": "cpp"
+        "functional": "cpp",
+        "chrono": "cpp"
     },
     "C_Cpp.errorSquiggles": "enabled"
 }
